@@ -11,43 +11,34 @@ A Model Context Protocol (MCP) server that provides news tools using the Kotlin 
 
 ## Prerequisites
 
-- Java 21 or higher
-- Gradle (included via wrapper if you generate one, or use system gradle)
+- Java 17 or higher
 
 ## Building
 
-Build the project using Gradle:
+### Create a Single Executable Binary (Shadow JAR)
+
+The easiest way to distribute this server is to create a "Fat JAR" which contains all dependencies in a single file.
 
 ```bash
-gradle build
+gradle shadowJar
 ```
 
-The executable JAR will be located at `build/libs/news-mcp-all.jar` (if you use a shadow jar) or you can run it via Gradle.
-To create a fat JAR, you might want to add the shadow plugin, but you can also run it directly:
-
-```bash
-gradle run
-```
+The resulting binary will be located at:
+`build/libs/news-mcp-1.0.0-all.jar`
 
 ## Usage
 
-### Starting the Local Server
+### Running the Binary Directly
 
-The server uses STDIO for communication. You can run it directly using the installed distribution:
+You can run the server on any machine with Java 17+ installed without needing the source code:
 
-1.  **Generate the distribution**:
-    ```bash
-    gradle installDist
-    ```
-2.  **Run the binary**:
-    ```bash
-    ./build/install/news-mcp/bin/news-mcp
-    ```
-    *Note: The server will wait for JSON-RPC input on stdin. To test it manually, you would need to send valid MCP protocol messages.*
+```bash
+java -jar build/libs/news-mcp-1.0.0-all.jar
+```
 
 ### Using from Jupyter Notebook
 
-You can consume this MCP server in a Jupyter Notebook using the Python `mcp` SDK.
+You can consume this MCP server in a Jupyter Notebook. Since it's a single JAR, it's very easy to reference.
 
 1.  **Install the MCP Python SDK**:
     ```bash
@@ -63,10 +54,10 @@ from mcp.client.stdio import stdio_client
 
 async def run_news_mcp():
     # Configure the server parameters
-    # Replace the path with the absolute path to your news-mcp binary
+    # Replace the path with the absolute path to your news-mcp-1.0.0-all.jar
     server_params = StdioServerParameters(
-        command="/home/rvv/Downloads/ai-experiments/News-MCP/build/install/news-mcp/bin/news-mcp",
-        args=[],
+        command="java",
+        args=["-jar", "/path/to/news-mcp-1.0.0-all.jar"],
         env=None
     )
 
@@ -108,14 +99,12 @@ Add the following to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "news": {
-      "command": "/path/to/news-mcp/build/install/news-mcp/bin/news-mcp",
-      "args": []
+      "command": "java",
+      "args": ["-jar", "/absolute/path/to/news-mcp-1.0.0-all.jar"]
     }
   }
 }
 ```
-
-*Note: You may need to run `gradle installDist` first to create the executable in `build/install`.*
 
 ## Tools
 
